@@ -9,8 +9,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   let base = '/'
-  if (env.VITE_APP_BASE_URL) {
-    base = env.VITE_APP_BASE_URL
+  if (env.VITE_BASE_URL) {
+    base = env.VITE_BASE_URL
   }
   return {
     plugins: [vue(), vueDevTools(), tailwindcss()],
