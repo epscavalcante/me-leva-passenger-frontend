@@ -2,7 +2,7 @@
 
 <template>
   <div role="status" class="max-w-sm animate-pulse">
-    <div class="h-5 bg-gray-400 rounded-full w-20"></div>
+    <div class="min-h-5 h-fit bg-gray-400 rounded-full"></div>
   </div>
 </template>
 
