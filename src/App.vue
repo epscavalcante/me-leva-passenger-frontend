@@ -1,5 +1,25 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import {
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogRoot,
+} from 'radix-vue'
+import { usePermission } from '@vueuse/core'
+import { computed } from 'vue'
+
+const geolocationPermission = usePermission('geolocation')
+
+const isGeolocationGranted = computed(() =>
+  ['granted', 'prompt'].includes(geolocationPermission.value as string),
+)
+
+function reloadPage() {
+  window.location.reload()
+}
 </script>
 
 <template>
@@ -90,12 +110,39 @@ import { RouterView } from 'vue-router'
       </button>
     </nav>
 
-    <main class="py-10 w-full overflow-auto">
-      <section class="container mx-auto">
+    <main v-if="isGeolocationGranted" class="py-10 w-full overflow-auto">
+      <section class="container mx-auto px-5 xl:px-0">
         <RouterView />
       </section>
     </main>
   </section>
+
+  <DialogRoot :open="!isGeolocationGranted">
+    <DialogPortal>
+      <DialogOverlay class="bg-black/90 data-[state=open]:animate-overlayShow fixed inset-0 z-30" />
+      <DialogContent
+        class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[650px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100]"
+      >
+        <DialogTitle class="m-0 text-[17px] font-semibold mb-20">Permissão obrigatória</DialogTitle>
+        <div class="w-full flex-col justify-center items-center gap-32">
+          <img src="@/assets/current-location.svg" alt="" class="max-w-3xs mx-auto" />
+          <div class="max-w-lg text-center mx-auto">
+            <DialogDescription class="my-10">
+              <p class="text-xl font-medium mb-10">
+                Ative a localização do seu dispositivo para que tudo funcione conforme esperado!
+              </p>
+            </DialogDescription>
+            <button
+              class="mb-10 md:mb-5 bg-gray-400 px-8 py-4 rounded-2xl font-medium hover:bg-gray-500 cursor-pointer"
+              @click="reloadPage"
+            >
+              Por favor, recarregue a página
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
 </template>
 
 <style scoped>
