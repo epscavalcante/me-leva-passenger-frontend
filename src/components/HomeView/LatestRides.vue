@@ -1,89 +1,33 @@
 <script setup lang="ts">
-import TableSkeleton from '@/components/TableSkeleton.vue'
-import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
-import RideService from '@/services/RideService'
 import Badge from '@/components/Badge.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import { useRoute, useRouter } from 'vue-router'
+import { inject, onBeforeMount, ref } from 'vue'
+import RideService from '@/services/RideService'
+import TableSkeleton from '../TableSkeleton.vue'
 
-const router = useRouter()
-const route = useRoute()
-const rides = ref({ items: [], total: 0, isLoading: false })
-const filters = ref({
-  driverId: null,
-  status: null,
-})
+const latestRides = ref({ items: [], total: 0, isLoading: false })
+
 let rideService: RideService
 
 onBeforeMount(async () => {
   rideService = inject('RideService') as RideService
-  setFilters(route.query)
+  await getLatestRides()
+  console.log('onBeforMounte')
 })
 
-onMounted(() => getRides())
-
-watch(
-  filters,
-  function (value) {
-    router.replace({
-      query: {
-        ...route.query,
-        ...value,
-      },
-    })
-  },
-  { deep: true },
-)
-
-watch(
-  route,
-  async function () {
-    await getRides()
-  },
-  { deep: true },
-)
-
-function setFilters(query: object = {}) {
-  filters.value.driverId = query.driverId
-  filters.value.status = query.status
-}
-
-async function getRides() {
-  rides.value.isLoading = true
-  const getRidesResponse = await rideService.getRides({
-    status: filters.value.status,
-    page: filters.value.page,
-    perPage: filters.value.perPage,
-    sortBy: filters.value.sortBy,
-    sortDir: filters.value.sortDir,
-  })
-  rides.value.items = getRidesResponse.items
-  rides.value.total = getRidesResponse.total
-  rides.value.isLoading = false
+async function getLatestRides() {
+  latestRides.value.isLoading = true
+  const getRidesResponse = await rideService.getRides()
+  latestRides.value.items = getRidesResponse.items
+  latestRides.value.total = getRidesResponse.total
+  latestRides.value.isLoading = false
 }
 </script>
 
 <template>
-  <main>
-    <h1 class="text-4xl font-bold mb-10">Rides</h1>
+  <section>
+    <h3 class="text-2xl font-semibold mb-10">Latest rides</h3>
 
-    <section class="bg-gray-300 mb-5 rounded-2xl flex gap-4 p-4">
-      <div class="flex flex-col max-w-2xs">
-        <BaseInput label="Driver ID" name="driverId" v-model="filters.driverId" /> <br />
-      </div>
-
-      <div class="flex flex-col max-w-2xs">
-        <BaseSelect
-          label="Ride status"
-          name="rideStatus"
-          v-model="filters.status"
-          :options="['requested', 'accepted', 'completed']"
-        />
-      </div>
-    </section>
-
-    <TableSkeleton v-if="rides.isLoading" />
+    <TableSkeleton v-if="latestRides.isLoading" />
 
     <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left">
@@ -111,7 +55,7 @@ async function getRides() {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) of rides.items" :key="index" class="bg-gray-300">
+          <tr v-for="(item, index) of latestRides.items" :key="index" class="bg-gray-300">
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
               Endereço de origem {{ item.fromLatitude }}
               {{ item.fromLongitude }}
@@ -164,7 +108,7 @@ async function getRides() {
         </tbody>
       </table>
     </div>
-  </main>
+  </section>
 </template>
 
 <style></style>

@@ -1,7 +1,1 @@
 @import 'tailwindcss';
-
-@utility custom-scrollbar {
-  &::-webkit-scrollbar {
-    @apply w-1;
-  }
-}
