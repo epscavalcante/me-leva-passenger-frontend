@@ -4,7 +4,7 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import { LatLng, LatLngBounds, Map, Marker, Polyline, TileLayer } from 'leaflet'
 
 const refMap = useTemplateRef('mapping')
-const map = ref<Map | null>(null)
+const map = ref<Map>()
 
 type Coordinate = {
   latitude: number
@@ -22,10 +22,6 @@ type Props = {
 const props = defineProps<Props>()
 
 onMounted(() => {
-  initMap()
-})
-
-function initMap() {
   const mapContainer = refMap.value as HTMLElement
   map.value = new Map(mapContainer)
   // map.value.setView(currentPosition, 15)
@@ -33,7 +29,7 @@ function initMap() {
   const tileLayer = new TileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   })
-  tileLayer.addTo(map.value as any)
+  tileLayer.addTo(map.value)
 
   if (props.currentPosition) {
     const currentPosition = new LatLng(
@@ -45,7 +41,8 @@ function initMap() {
   }
 
   if (props.startPosition) {
-    setPosition(map.value, props.startPosition)
+    const startPosition = new LatLng(props.startPosition.latitude, props.startPosition.longitude)
+    setPosition(map.value, startPosition)
   }
 
   if (props.endPosition) {
@@ -62,7 +59,7 @@ function initMap() {
   }
 
   map.value = map.value
-}
+})
 
 function setPosition(map: Map, position: LatLng) {
   const marker = new Marker(position)

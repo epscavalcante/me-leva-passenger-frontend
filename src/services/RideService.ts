@@ -1,21 +1,20 @@
 import type HttpClient from '@/clients/http/HttpClient'
-import Utils from '@/utils'
 
 export default class RideService {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getRides(params?: GetRidesParams): Promise<GetRidesResponse> {
     const response = await this.httpClient.get<{ items: []; total: number }>(`api/rides`, {
-      queryParams: {
-        page: params?.page,
-        status: params?.status,
-        perPage: params?.perPage,
-        sortBy: params?.sortBy,
-        sortDir: params?.sortDir,
-      },
       headers: {
         'Content-Type': 'application/json',
         accept: 'application/json',
+      },
+      queryParams: {
+        ...(params?.status && { status: params.status }),
+        ...(params?.page && { page: params.perPage }),
+        ...(params?.perPage && { perPage: Number(params.perPage) }),
+        ...(params?.sortBy && { sortBy: params.sortBy }),
+        ...(params?.sortDir && { sortDir: params.sortDir as 'DESC' | 'ASC' }),
       },
     })
     return {
@@ -30,17 +29,32 @@ export default class RideService {
   }
 }
 
-type GetRidesParams = {
+export type GetRidesParams = {
   page?: number
-  status?: string | null
   perPage?: number
+  status?: string
   sortBy?: string
   sortDir?: 'DESC' | 'ASC'
 }
 
+export type GetRideByIdResponse = {}
+
 export type GetRidesResponse = {
-  items: []
+  items: GetRidesItemResponse[]
   total: number
 }
 
-export type GetRideByIdResponse = {}
+export type GetRidesItemResponse = {
+  rideId: string
+  fromLatitude: string
+  fromLongitude: string
+  toLatitude: string
+  toLongitude: string
+  driverId: string
+  driverName: string
+  passengerId: string
+  passengerName: string
+  status: string
+  distance: number
+  fare: number
+}

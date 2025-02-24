@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import TableSkeleton from '@/components/TableSkeleton.vue'
 import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
-import RideService from '@/services/RideService'
+import RideService, { type GetRidesParams, type GetRidesResponse } from '@/services/RideService'
 import Badge from '@/components/Badge.vue'
-import BaseInput from '@/components/BaseInput.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type LocationQuery } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
-const rides = ref({ items: [], total: 0, isLoading: false })
-const filters = ref({
-  driverId: null,
-  status: null,
-})
+const isLoading = ref(false)
+const rides = ref<GetRidesResponse>({ items: [], total: 0 })
+const filters = ref<GetRidesParams>({})
 let rideService: RideService
 
 onBeforeMount(async () => {
@@ -36,21 +33,18 @@ watch(
   { deep: true },
 )
 
-watch(
-  route,
-  async function () {
-    await getRides()
-  },
-  { deep: true },
-)
+watch(route, async () => await getRides(), { deep: true })
 
-function setFilters(query: object = {}) {
-  filters.value.driverId = query.driverId
-  filters.value.status = query.status
+function setFilters(query: LocationQuery = {}) {
+  filters.value.status = query.status as string
+  filters.value.page = parseInt(query.page as string)
+  filters.value.perPage = parseInt(query.perPage as string)
+  filters.value.sortBy = query.sortBy as string
+  filters.value.sortDir = query.sortDir as 'DESC' | 'ASC'
 }
 
 async function getRides() {
-  rides.value.isLoading = true
+  isLoading.value = true
   const getRidesResponse = await rideService.getRides({
     status: filters.value.status,
     page: filters.value.page,
@@ -60,7 +54,7 @@ async function getRides() {
   })
   rides.value.items = getRidesResponse.items
   rides.value.total = getRidesResponse.total
-  rides.value.isLoading = false
+  isLoading.value = false
 }
 </script>
 
@@ -69,10 +63,6 @@ async function getRides() {
     <h1 class="text-4xl font-bold mb-10">Rides</h1>
 
     <section class="bg-gray-300 mb-5 rounded-2xl flex gap-4 p-4">
-      <div class="flex flex-col max-w-2xs">
-        <BaseInput label="Driver ID" name="driverId" v-model="filters.driverId" /> <br />
-      </div>
-
       <div class="flex flex-col max-w-2xs">
         <BaseSelect
           label="Ride status"
@@ -83,7 +73,7 @@ async function getRides() {
       </div>
     </section>
 
-    <TableSkeleton v-if="rides.isLoading" />
+    <TableSkeleton v-if="isLoading" />
 
     <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left">

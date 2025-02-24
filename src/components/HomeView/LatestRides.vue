@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Badge from '@/components/Badge.vue'
 import { inject, onBeforeMount, ref } from 'vue'
-import RideService from '@/services/RideService'
+import RideService, { type GetRidesResponse } from '@/services/RideService'
 import TableSkeleton from '../TableSkeleton.vue'
 
-const latestRides = ref({ items: [], total: 0, isLoading: false })
+const isLoading = ref(false)
+const latestRides = ref<GetRidesResponse>({ items: [], total: 0 })
 
 let rideService: RideService
 
@@ -15,11 +16,11 @@ onBeforeMount(async () => {
 })
 
 async function getLatestRides() {
-  latestRides.value.isLoading = true
+  isLoading.value = true
   const getRidesResponse = await rideService.getRides()
   latestRides.value.items = getRidesResponse.items
   latestRides.value.total = getRidesResponse.total
-  latestRides.value.isLoading = false
+  isLoading.value = false
 }
 </script>
 
@@ -27,7 +28,7 @@ async function getLatestRides() {
   <section>
     <h3 class="text-2xl font-semibold mb-10">Latest rides</h3>
 
-    <TableSkeleton v-if="latestRides.isLoading" />
+    <TableSkeleton v-if="isLoading" />
 
     <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left">

@@ -1,6 +1,10 @@
+type Headers = Record<string, string | number>
+
+type QueryParams = Record<string, string | number>
+
 export type HttpOptions = {
-  headers?: { [key: string]: string | number }
-  queryParams?: Record<string, string | number>
+  headers?: Headers
+  queryParams?: QueryParams
 }
 
 export default interface HttpClient {
