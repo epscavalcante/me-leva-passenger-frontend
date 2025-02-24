@@ -1,47 +1,138 @@
 <script setup lang="ts">
-import LineSkeleton from '@/components/LineSkeleton.vue'
+import TableSkeleton from '@/components/TableSkeleton.vue'
+import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
+import RideService from '@/services/RideService'
+import Badge from '@/components/Badge.vue'
+import BaseInput from '@/components/BaseInput.vue'
+import BaseSelect from '@/components/BaseSelect.vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const rides = ref({ items: [], total: 0, isLoading: false })
+const filters = ref({
+  driverId: null,
+  status: null,
+})
+let rideService: RideService
+
+onBeforeMount(async () => {
+  rideService = inject('RideService') as RideService
+  setFilters(route.query)
+})
+
+onMounted(() => getRides())
+
+watch(
+  filters,
+  function (value) {
+    router.replace({
+      query: {
+        ...route.query,
+        ...value,
+      },
+    })
+  },
+  { deep: true },
+)
+
+watch(
+  route,
+  async function () {
+    await getRides()
+  },
+  { deep: true },
+)
+
+function setFilters(query: object = {}) {
+  filters.value.driverId = query.driverId
+  filters.value.status = query.status
+}
+
+async function getRides() {
+  rides.value.isLoading = true
+  const getRidesResponse = await rideService.getRides({
+    status: filters.value.status,
+    page: filters.value.page,
+    perPage: filters.value.perPage,
+    sortBy: filters.value.sortBy,
+    sortDir: filters.value.sortDir,
+  })
+  rides.value.items = getRidesResponse.items
+  rides.value.total = getRidesResponse.total
+  rides.value.isLoading = false
+}
 </script>
 
 <template>
   <main>
     <h1 class="text-4xl font-bold mb-10">Rides</h1>
 
-    <section class="bg-gray-300 h-20 mb-5 rounded-2xl"></section>
+    <section class="bg-gray-300 mb-5 rounded-2xl flex gap-4 p-4">
+      <div class="flex flex-col max-w-2xs">
+        <BaseInput label="Driver ID" name="driverId" v-model="filters.driverId" /> <br />
+      </div>
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div class="flex flex-col max-w-2xs">
+        <BaseSelect
+          label="Ride status"
+          name="rideStatus"
+          v-model="filters.status"
+          :options="['requested', 'accepted', 'completed']"
+        />
+      </div>
+    </section>
+
+    <TableSkeleton v-if="rides.isLoading" />
+
+    <div v-else class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-300">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-400">
           <tr>
-            <th scope="col" class="px-6 py-3">Column</th>
+            <th scope="col" class="px-6 py-3">Origem X Destino</th>
             <th scope="col" class="px-6 py-3 w-40">
-              <div class="flex items-center">Column</div>
+              <div class="flex items-center">Status</div>
             </th>
             <th scope="col" class="px-6 py-3 w-40">
-              <div class="flex items-center">Column</div>
+              <div class="flex items-center">Distância</div>
             </th>
             <th scope="col" class="px-6 py-3 w-40">
-              <div class="flex items-center">Column</div>
+              <div class="flex items-center">Preço</div>
             </th>
             <th scope="col" class="px-6 py-3 w-40">
-              <span class="sr-only">Column</span>
+              <div class="flex items-center">Solictado em</div>
+            </th>
+            <th scope="col" class="px-6 py-3 w-40">
+              <div class="flex items-center">Motorista</div>
+            </th>
+            <th scope="col" class="px-6 py-3 w-20">
+              <span class="sr-only"></span>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="i of 10" :key="i" class="bg-gray-300">
+          <tr v-for="(item, index) of rides.items" :key="index" class="bg-gray-300">
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              <div role="status" class="max-w-sm animate-pulse w-full">
-                <div class="h-5 rounded-full bg-gray-400 w-full"></div>
-              </div>
+              Endereço de origem {{ item.fromLatitude }}
+              {{ item.fromLongitude }}
+              <br />
+              Endereço destino {{ item.toLatitude }}
+              {{ item.toLongitude }}
             </th>
             <td class="px-6 py-4">
-              <LineSkeleton />
+              <Badge>{{ item.status }}</Badge>
             </td>
             <td class="px-6 py-4">
-              <LineSkeleton />
+              {{ item.distance }}
             </td>
             <td class="px-6 py-4">
-              <LineSkeleton />
+              {{ item.fare }}
+            </td>
+            <td class="px-6 py-4">
+              {{ Date.now() }}
+            </td>
+            <td class="px-6 py-4">
+              {{ item.driverName || '-' }}
             </td>
             <td class="px-6 py-4 flex justify-center">
               <a
