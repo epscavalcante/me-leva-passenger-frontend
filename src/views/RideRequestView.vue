@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import TheMapping from './TheMapping.vue'
+import { computed, inject, onBeforeMount, ref } from 'vue'
+import TheMapping from '@/components/TheMapping.vue'
 import {
   DialogContent,
   DialogOverlay,
@@ -10,6 +10,15 @@ import {
   DialogRoot,
 } from 'radix-vue'
 import Utils from '@/utils'
+import type RideGateway from '@/gateways/RideGateway'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+let rideGateway: RideGateway
+
+onBeforeMount(async () => {
+  rideGateway = inject('RideGateway') as RideGateway
+})
 
 const isRideSimulationDialogOpened = ref(false)
 const isRideSimulationLoading = ref(true)
@@ -68,6 +77,23 @@ async function openRideSimulation() {
 function cancelSimulation() {
   isRideSimulationDialogOpened.value = false
   isRideSimulationLoading.value = true
+}
+
+async function requestRide() {
+  const requestRideResponse = await rideGateway.requestRide({
+    passenger_id: '3fdbfe0a-25b4-3014-a63e-43ffe54d6cb5',
+    from_latitude: 15.82331,
+    from_longitude: -47.92588,
+    to_latitude: -15.82758,
+    to_longitude: -47.92532,
+  })
+
+  console.log({ requestRideResponse })
+
+  await router.push({
+    name: 'rides.detail',
+    params: { rideId: requestRideResponse.rideId },
+  })
 }
 </script>
 
@@ -201,6 +227,7 @@ function cancelSimulation() {
         <button
           type="button"
           class="bg-gray-500 w-full px-4 py-5 rounded-lg font-medium cursor-pointer mt-5"
+          @click="requestRide"
         >
           Confirm, Request ride
         </button>

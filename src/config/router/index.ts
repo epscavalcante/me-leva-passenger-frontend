@@ -6,18 +6,30 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../../views/HomeView.vue'),
+      component: () => import('@/views/HomeView.vue'),
     },
     {
       path: '/rides',
       name: 'rides',
-      component: () => import('../../views/RidesView.vue'),
+      component: () => import('@/views/RideListView.vue'),
+    },
+
+    {
+      path: '/rides/new',
+      name: 'rides.new',
+      component: () => import('@/views/RideRequestView.vue'),
+    },
+
+    {
+      path: '/rides/:rideId',
+      name: 'rides.detail',
+      component: () => import('@/views/RideDetailView.vue'),
     },
 
     {
       path: '/account',
       name: 'account',
-      component: () => import('../../views/AccountView.vue'),
+      component: () => import('@/views/AccountView.vue'),
     },
   ],
 })

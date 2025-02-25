@@ -7,8 +7,8 @@ const refMap = useTemplateRef('mapping')
 const map = ref<Map>()
 
 type Coordinate = {
-  latitude: number
-  longitude: number
+  latitude: number | string
+  longitude: number | string
 }
 
 type Props = {

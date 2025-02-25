@@ -4,7 +4,7 @@ import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
 import RideService, { type GetRidesParams, type GetRidesResponse } from '@/services/RideService'
 import Badge from '@/components/Badge.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
-import { useRoute, useRouter, type LocationQuery } from 'vue-router'
+import { RouterLink, useRoute, useRouter, type LocationQuery } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
@@ -60,7 +60,18 @@ async function getRides() {
 
 <template>
   <main>
-    <h1 class="text-4xl font-bold mb-10">Rides</h1>
+    <section>
+      <section class="flex justify-between items-center mb-10">
+        <h1 class="text-4xl font-bold">Rides</h1>
+
+        <RouterLink
+          :to="{ name: 'rides.new' }"
+          class="bg-gray-300 px-4 py-3 rounded-lg hover:bg-gray-400 font-medium"
+        >
+          Request ride
+        </RouterLink>
+      </section>
+    </section>
 
     <section class="bg-gray-300 mb-5 rounded-2xl flex gap-4 p-4">
       <div class="flex flex-col max-w-2xs">
@@ -125,8 +136,8 @@ async function getRides() {
               {{ item.driverName || '-' }}
             </td>
             <td class="px-6 py-4 flex justify-center">
-              <a
-                href="#"
+              <RouterLink
+                :to="{ name: 'rides.detail', params: { rideId: item.rideId } }"
                 class="font-medium text-center text-blue-600 dark:text-blue-500 hover:underline"
               >
                 <svg
@@ -148,7 +159,7 @@ async function getRides() {
                     d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                   />
                 </svg>
-              </a>
+              </RouterLink>
             </td>
           </tr>
         </tbody>
