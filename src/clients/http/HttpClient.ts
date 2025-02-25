@@ -1,6 +1,6 @@
-type Headers = Record<string, string | number>
+export type Headers = Record<string, string | number>
 
-type QueryParams = Record<string, string | number>
+export type QueryParams = Record<string, string | number>
 
 export type HttpOptions = {
   headers?: Headers
@@ -9,4 +9,6 @@ export type HttpOptions = {
 
 export default interface HttpClient {
   get<R>(url: string, options?: HttpOptions): Promise<R>
+  postJson<B, R>(url: string, data?: B, options?: HttpOptions): Promise<R>
+  getJson<R>(url: string, options?: HttpOptions): Promise<R>
 }
