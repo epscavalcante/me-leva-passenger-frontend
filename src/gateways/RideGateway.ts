@@ -15,13 +15,19 @@ export class RideHttpGateway implements RideGateway {
   }
 
   async requestRide(body: RequestRideInput): Promise<RequestRideOutput> {
-    const response = await this.httpClient.postJson<RequestRideInput, RequestRideOutput>(
+    const response = await this.httpClient.postJson<RequestRideApiInput, RequestRideApiOutput>(
       '/api/rides',
-      body,
+      {
+        passenger_id: body.passengerId,
+        from_latitude: body.fromLatitude,
+        from_longitude: body.fromLongitude,
+        to_latitude: body.toLatitude,
+        to_longitude: body.toLongitude,
+      },
     )
 
     return {
-      rideId: response.rideId,
+      rideId: response.ride_id || response.rideId,
     }
   }
 
@@ -29,18 +35,20 @@ export class RideHttpGateway implements RideGateway {
     const response = (await this.httpClient.get(`api/rides`, {
       queryParams: {
         page: 1,
-        perPage: 2,
-        sortBy: 'created_at',
-        sortDir: 'DESC',
+        per_age: 2,
+        sort_by: 'created_at',
+        sort_dir: 'DESC',
       },
     })) as any
+
+    // onde faço a conversão para camelCase
     return {
       items: response.items,
     }
   }
 }
 
-export type RequestRideInput = {
+export type RequestRideApiInput = {
   passenger_id: string
   from_latitude: number
   from_longitude: number
@@ -48,8 +56,20 @@ export type RequestRideInput = {
   to_longitude: number
 }
 
+export type RequestRideInput = {
+  passengerId: string
+  fromLatitude: number
+  fromLongitude: number
+  toLatitude: number
+  toLongitude: number
+}
+
 export type RequestRideOutput = {
   rideId: string
+}
+
+export type RequestRideApiOutput = {
+  ride_id: string
 }
 
 export type GetRidesParams = {
