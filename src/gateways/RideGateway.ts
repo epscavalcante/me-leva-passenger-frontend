@@ -27,7 +27,7 @@ export class RideHttpGateway implements RideGateway {
     )
 
     return {
-      rideId: response.ride_id || response.rideId,
+      rideId: response.ride_id,
     }
   }
 
