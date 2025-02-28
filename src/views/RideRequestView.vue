@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import TheMapping from './TheMapping.vue'
+import { computed, inject, onBeforeMount, ref } from 'vue'
+import TheMapping from '@/components/TheMapping.vue'
 import {
   DialogContent,
   DialogOverlay,
@@ -10,6 +10,23 @@ import {
   DialogRoot,
 } from 'radix-vue'
 import Utils from '@/utils'
+import type RideGateway from '@/gateways/RideGateway'
+import { useRouter } from 'vue-router'
+import BaseInput from '@/components/BaseInput.vue'
+
+const router = useRouter()
+let rideGateway: RideGateway
+
+const formInput = ref({
+  fromLatitude: -15.82449,
+  fromLongitude: -47.92756,
+  toLatitude: -15.8276,
+  toLongitude: -47.92621,
+})
+
+onBeforeMount(async () => {
+  rideGateway = inject('RideGateway') as RideGateway
+})
 
 const isRideSimulationDialogOpened = ref(false)
 const isRideSimulationLoading = ref(true)
@@ -69,6 +86,20 @@ function cancelSimulation() {
   isRideSimulationDialogOpened.value = false
   isRideSimulationLoading.value = true
 }
+
+async function requestRide() {
+  const requestRideResponse = await rideGateway.requestRide({
+    passengerId: '6f9c9375-5671-3bbe-a412-dfae3a423061',
+    ...formInput.value,
+  })
+
+  console.log({ requestRideResponse })
+
+  await router.push({
+    name: 'rides.detail',
+    params: { rideId: requestRideResponse.rideId },
+  })
+}
 </script>
 
 <template>
@@ -87,54 +118,16 @@ function cancelSimulation() {
       <h4 class="font-bold mb-3">Pickup location</h4>
 
       <div class="flex gap-4">
-        <div class="w-full">
-          <label for="large-input" class="block mb-1.5 text-sm font-medium text-gray-900"
-            >From latitude</label
-          >
-          <input
-            type="text"
-            id="large-input"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-400 text-base"
-          />
-        </div>
-
-        <div class="w-full">
-          <label for="large-input" class="block mb-1.5 text-sm font-medium text-gray-900"
-            >From longitude</label
-          >
-          <input
-            type="text"
-            id="large-input"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-400 text-base"
-          />
-        </div>
+        <BaseInput v-model="formInput.fromLatitude" label="From latitude" name="from_latitude" />
+        <BaseInput v-model="formInput.fromLongitude" label="From longitude" name="from_longitude" />
       </div>
 
       <br />
 
       <h4 class="font-bold mb-3">Where to</h4>
       <div class="flex gap-4">
-        <div class="w-full">
-          <label for="to-latitude" class="block mb-1.5 text-sm font-medium text-gray-900"
-            >To latitude</label
-          >
-          <input
-            type="text"
-            id="to-latitude"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-400 text-base"
-          />
-        </div>
-
-        <div class="w-full">
-          <label for="to-longitude" class="block mb-1.5 text-sm font-medium text-gray-900"
-            >To longitude</label
-          >
-          <input
-            type="text"
-            id="to-longitude"
-            class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-400 text-base"
-          />
-        </div>
+        <BaseInput v-model="formInput.toLatitude" label="To latitude" name="to_latitude" />
+        <BaseInput v-model="formInput.toLongitude" label="To longitude" name="to_longitude" />
       </div>
 
       <br />
@@ -201,6 +194,7 @@ function cancelSimulation() {
         <button
           type="button"
           class="bg-gray-500 w-full px-4 py-5 rounded-lg font-medium cursor-pointer mt-5"
+          @click="requestRide"
         >
           Confirm, Request ride
         </button>

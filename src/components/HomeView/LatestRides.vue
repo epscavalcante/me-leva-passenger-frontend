@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import Badge from '@/components/Badge.vue'
 import { inject, onBeforeMount, ref } from 'vue'
-import RideService, { type GetRidesResponse } from '@/services/RideService'
 import TableSkeleton from '../TableSkeleton.vue'
+import type RideGateway from '@/gateways/RideGateway'
+import type { GetLatestRidesResponde } from '@/gateways/RideGateway'
 
 const isLoading = ref(false)
-const latestRides = ref<GetRidesResponse>({ items: [], total: 0 })
+const latestRides = ref<GetLatestRidesResponde>({ items: [] })
 
-let rideService: RideService
+let rideGateway: RideGateway
 
 onBeforeMount(async () => {
-  rideService = inject('RideService') as RideService
+  rideGateway = inject('RideGateway') as RideGateway
   await getLatestRides()
-  console.log('onBeforMounte')
 })
 
 async function getLatestRides() {
   isLoading.value = true
-  const getRidesResponse = await rideService.getRides()
+  const getRidesResponse = await rideGateway.getLatestRides()
   latestRides.value.items = getRidesResponse.items
-  latestRides.value.total = getRidesResponse.total
   isLoading.value = false
 }
 </script>
