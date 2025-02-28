@@ -8,10 +8,6 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  let base = '/'
-  if (env.VITE_BASE_URL) {
-    base = env.VITE_BASE_URL
-  }
   return {
     plugins: [vue(), vueDevTools(), tailwindcss()],
     resolve: {
@@ -19,6 +15,6 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    base,
+    base: '/me-leva-passenger-frontend/',
   }
 })
