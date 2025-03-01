@@ -1,6 +1,6 @@
-export type Headers = Record<string, string | number>
+export type Headers = Record<string, string | number | undefined>
 
-export type QueryParams = Record<string, string | number>
+export type QueryParams = Record<string, string | number | undefined>
 
 export type HttpOptions = {
   headers?: Headers

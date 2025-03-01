@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Badge from '@/components/Badge.vue'
 import { inject, onBeforeMount, ref } from 'vue'
-import TableSkeleton from '../TableSkeleton.vue'
+import TableSkeleton from '@/components/TableSkeleton.vue'
 import type RideGateway from '@/gateways/RideGateway'
-import type { GetLatestRidesResponde } from '@/gateways/RideGateway'
+import type { GetLatestRidesOutput } from '@/gateways/RideGateway'
 
 const isLoading = ref(false)
-const latestRides = ref<GetLatestRidesResponde>({ items: [] })
+const latestRides = ref<GetLatestRidesOutput>({ items: [] })
 
 let rideGateway: RideGateway
 
