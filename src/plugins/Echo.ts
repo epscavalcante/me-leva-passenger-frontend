@@ -1,6 +1,7 @@
 import Echo from 'laravel-echo'
 import type { App } from 'vue'
 import Pusher from 'pusher-js'
+import { echoInjectionKey } from '@/config/app/injectionKeys'
 
 export default {
   install(app: App, options: Options) {
@@ -17,7 +18,7 @@ export default {
     })
 
     app.config.globalProperties.$echo = echo
-    app.provide('Echo', echo)
+    app.provide(echoInjectionKey, echo)
   },
 }
 

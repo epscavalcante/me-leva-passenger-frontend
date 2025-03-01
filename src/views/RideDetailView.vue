@@ -1,33 +1,44 @@
 <script setup lang="ts">
 import { inject, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import type RideGateway from '@/gateways/RideGateway'
 import type { GetRideDetailResponse } from '@/gateways/RideGateway'
 import TheMapping from '@/components/TheMapping.vue'
 import { toast } from 'vue-sonner'
-import type { EchoType } from '@/plugins/Echo'
+import { echoInjectionKey, rideGatewayInjectionKey } from '@/config/app/injectionKeys'
 const route = useRoute()
 const isLoading = ref(true)
 const rideDetail = ref<GetRideDetailResponse | null>(null)
-const rideGateway: RideGateway = inject('RideGateway')!
-const echo: EchoType = inject('Echo')!
+const rideGateway = inject(rideGatewayInjectionKey)
+const echo = inject(echoInjectionKey)
 
 onMounted(async () => {
-  await getRideDetail(route.params.rideId as string)
-  setupRideStartedEvent()
+  const rideId = route.params.rideId as string
+  await getRideDetail(rideId)
+  setupRideEventsForRideId(rideId)
 })
 
 async function getRideDetail(rideId: string) {
   isLoading.value = true
-  const getRideDetailResponse = await rideGateway.getRideDetail(rideId)
+  const getRideDetailResponse = await rideGateway!.getRideDetail(rideId)
   rideDetail.value = getRideDetailResponse
   isLoading.value = false
 }
 
-function setupRideStartedEvent() {
-  echo.channel('RideStartedEvent').listen('.rides.started', function () {
-    toast('Ride started')
-  })
+function setupRideEventsForRideId(rideId: string) {
+  echo!
+    .channel(`rides.${rideId}`)
+    .listen('.RIDE.ACCEPTED', function () {
+      toast('Ride accepted')
+    })
+    .listen('.RIDE.STARTED', function () {
+      toast('Ride started')
+    })
+    .listen('.RIDE.POSITION_UPDATED', function () {
+      toast('Ride Position updated')
+    })
+    .listen('.RIDE.COMPLETED', function () {
+      toast('Ride finished')
+    })
 }
 </script>
 

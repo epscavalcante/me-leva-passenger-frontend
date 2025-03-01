@@ -1,57 +1,39 @@
 <script setup lang="ts">
 import TableSkeleton from '@/components/TableSkeleton.vue'
-import { inject, onBeforeMount, onMounted, ref, watch } from 'vue'
-import RideService, { type GetRidesParams, type GetRidesResponse } from '@/services/RideService'
+import { inject, onMounted, ref, watch } from 'vue'
 import Badge from '@/components/Badge.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
-import { RouterLink, useRoute, useRouter, type LocationQuery } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { rideGatewayInjectionKey } from '@/config/app/injectionKeys'
+import type { GetRidesOutput } from '@/gateways/RideGateway'
 
 const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
-const rides = ref<GetRidesResponse>({ items: [], total: 0 })
-const filters = ref<GetRidesParams>({})
-let rideService: RideService
-
-onBeforeMount(async () => {
-  rideService = inject('RideService') as RideService
-  setFilters(route.query)
+const rides = ref<GetRidesOutput>({ total: 0, items: [] })
+const filters = ref({
+  page: 1,
+  status: undefined,
+  ...route.query,
 })
+const rideGateway = inject(rideGatewayInjectionKey)!
 
 onMounted(() => getRides())
 
 watch(
   filters,
-  function (value) {
-    router.replace({
-      query: {
-        ...route.query,
-        ...value,
-      },
+  function () {
+    getRides()
+    router.push({
+      query: filters.value,
     })
   },
   { deep: true },
 )
 
-watch(route, async () => await getRides(), { deep: true })
-
-function setFilters(query: LocationQuery = {}) {
-  filters.value.status = query.status as string
-  filters.value.page = parseInt(query.page as string)
-  filters.value.perPage = parseInt(query.perPage as string)
-  filters.value.sortBy = query.sortBy as string
-  filters.value.sortDir = query.sortDir as 'DESC' | 'ASC'
-}
-
 async function getRides() {
   isLoading.value = true
-  const getRidesResponse = await rideService.getRides({
-    status: filters.value.status,
-    page: filters.value.page,
-    perPage: filters.value.perPage,
-    sortBy: filters.value.sortBy,
-    sortDir: filters.value.sortDir,
-  })
+  const getRidesResponse = await rideGateway.getRides(filters.value)
   rides.value.items = getRidesResponse.items
   rides.value.total = getRidesResponse.total
   isLoading.value = false

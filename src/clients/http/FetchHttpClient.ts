@@ -20,7 +20,8 @@ export default class FetchHttpAdapter implements HttpClient {
     const _url = new URL(url, this.baseUrl)
     if (options?.queryParams) {
       for (const param of Object.keys(options.queryParams)) {
-        _url.searchParams.append(param, String(options.queryParams[param]))
+        if (options.queryParams[param])
+          _url.searchParams.append(param, String(options.queryParams[param]))
       }
     }
 
@@ -39,14 +40,15 @@ export default class FetchHttpAdapter implements HttpClient {
     headers.append('Accept', 'application/json')
     if (options?.headers) {
       for (const header of Object.keys(options.headers)) {
-        headers.append(header, String(options.headers[header]))
+        if (options.headers[header]) headers.append(header, String(options.headers[header]))
       }
     }
 
     const _url = new URL(url, this.baseUrl)
     if (options?.queryParams) {
       for (const param of Object.keys(options.queryParams)) {
-        _url.searchParams.append(param, String(options.queryParams[param]))
+        if (options.queryParams[param])
+          _url.searchParams.append(param, String(options.queryParams[param]))
       }
     }
 

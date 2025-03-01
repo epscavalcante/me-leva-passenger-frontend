@@ -2,14 +2,15 @@ import type HttpClient from '@/clients/http/HttpClient'
 
 export default interface RideGateway {
   requestRide(body: RequestRideInput): Promise<RequestRideOutput>
-  getLatestRides(): Promise<GetLatestRidesResponde>
-  getRideDetail(rideId: string): Promise<GetRideDetailResponse>
+  getRides(params?: GetRidesParams): Promise<GetRidesOutput>
+  getLatestRides(): Promise<GetLatestRidesOutput>
+  getRideDetail(rideId: string): Promise<GetRideDetailOutput>
 }
 
 export class RideHttpGateway implements RideGateway {
   constructor(private readonly httpClient: HttpClient) {}
 
-  async getRideDetail(rideId: string): Promise<GetRideDetailResponse> {
+  async getRideDetail(rideId: string): Promise<GetRideDetailOutput> {
     const response = await this.httpClient.getJson<GetRideDetailResponse>(`/api/rides/${rideId}`)
     return response
   }
@@ -31,18 +32,33 @@ export class RideHttpGateway implements RideGateway {
     }
   }
 
-  async getLatestRides(): Promise<GetLatestRidesResponde> {
-    const response = (await this.httpClient.get(`api/rides`, {
+  async getLatestRides(): Promise<GetLatestRidesOutput> {
+    const response = await this.httpClient.getJson<GetLatestRidesResponse>(`api/rides`, {
       queryParams: {
         page: 1,
         per_age: 2,
         sort_by: 'created_at',
         sort_dir: 'DESC',
       },
-    })) as any
+    })
 
     // onde faço a conversão para camelCase
     return {
+      items: response.items,
+    }
+  }
+
+  async getRides(params?: GetRidesParams): Promise<GetRidesOutput> {
+    const response = await this.httpClient.getJson<GetRidesResponse>('api/rides', {
+      queryParams: {
+        page: params?.page,
+        status: params?.status,
+        sort_by: params?.sortBy,
+        sort_dir: params?.sortDir,
+      },
+    })
+    return {
+      total: response.total,
       items: response.items,
     }
   }
@@ -80,7 +96,7 @@ export type GetRidesParams = {
   sortDir?: 'DESC' | 'ASC'
 }
 
-export type GetLatestRidesResponde = {
+export type GetLatestRidesOutput = {
   items: {
     rideId: string
     fromLatitude: string
@@ -95,6 +111,75 @@ export type GetLatestRidesResponde = {
     distance: number
     fare: number
   }[]
+}
+
+export type GetLatestRidesResponse = {
+  items: {
+    rideId: string
+    fromLatitude: string
+    fromLongitude: string
+    toLatitude: string
+    toLongitude: string
+    driverId: string
+    driverName: string
+    passengerId: string
+    passengerName: string
+    status: string
+    distance: number
+    fare: number
+  }[]
+}
+
+export type GetRidesOutput = {
+  total: number
+  items: {
+    rideId: string
+    fromLatitude: string
+    fromLongitude: string
+    toLatitude: string
+    toLongitude: string
+    driverId: string
+    driverName: string
+    passengerId: string
+    passengerName: string
+    status: string
+    distance: number
+    fare: number
+  }[]
+}
+
+export type GetRidesResponse = {
+  total: number
+  items: {
+    rideId: string
+    fromLatitude: string
+    fromLongitude: string
+    toLatitude: string
+    toLongitude: string
+    driverId: string
+    driverName: string
+    passengerId: string
+    passengerName: string
+    status: string
+    distance: number
+    fare: number
+  }[]
+}
+
+export type GetRideDetailOutput = {
+  rideId: string
+  fromLatitude: string
+  fromLongitude: string
+  toLatitude: string
+  toLongitude: string
+  driverId: string
+  driverName: string
+  passengerId: string
+  passengerName: string
+  status: string
+  distance: number
+  fare: number
+  positions: { latitude: string; longitude: string }[]
 }
 
 export type GetRideDetailResponse = {
