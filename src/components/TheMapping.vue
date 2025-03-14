@@ -72,8 +72,8 @@ function setDirection(map: Map, directions: LatLng[]) {
   const trace = new Polyline(directions, {
     color: 'black',
     weight: 5,
-    opacity: 0.9,
-    smoothFactor: 1,
+    opacity: 1,
+    className: 'animate-pulse',
   })
   trace.addTo(map)
 
