@@ -9,7 +9,7 @@ export default interface RideGateway {
 }
 
 export class RideHttpGateway implements RideGateway {
-  private _authStore: unknown
+  private _authStore: any
 
   constructor(private readonly httpClient: HttpClient) {
     this._authStore = authStore()
@@ -37,7 +37,7 @@ export class RideHttpGateway implements RideGateway {
       },
       {
         headers: {
-          Authorization: `Bearer ${this._authStore.getToken}`,
+          Authorization: `Bearer ${this._authStore.getToken as string}`,
         },
       },
     )

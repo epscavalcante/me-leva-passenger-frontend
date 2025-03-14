@@ -61,7 +61,6 @@ function cancelSimulation() {
 
 async function requestRide() {
   const requestRideResponse = await rideGateway.requestRide({
-    passengerId: '6f9c9375-5671-3bbe-a412-dfae3a423061',
     ...formInput.value,
   })
 

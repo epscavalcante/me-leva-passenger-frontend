@@ -2,7 +2,7 @@ import { authStore } from '@/config/stores/authStore'
 import type { RouteLocation } from 'vue-router'
 import { toast } from 'vue-sonner'
 
-export function authGuard(to: RouteLocation, from: RouteLocation, next: unknown) {
+export function authGuard(to: RouteLocation, from: RouteLocation, next: any) {
   if (to.meta.requiresGuest) {
     const store = authStore()
 
