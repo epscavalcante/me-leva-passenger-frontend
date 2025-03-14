@@ -18,18 +18,20 @@ onMounted(() => {
 
   const startPosition1 = new LatLng(-15.82594, -47.92923)
   const endPosition1 = new LatLng(-15.82942, -47.92765)
-  const points1 = getPositions().map((point) => new LatLng(point.latitude, point.longitude))
+  const points1 = getPositions4().map((point) => new LatLng(point.latitude, point.longitude))
+  const points2 = getPositions3().map((point) => new LatLng(point.latitude, point.longitude))
 
   addRoute(map.value, startPosition1, endPosition1, points1)
+  addRoute(map.value, startPosition1, endPosition1, points2)
 
-  const startPosition2 = new LatLng(-15.82449, -47.92756)
-  const endPosition2 = new LatLng(-15.8276, -47.92621)
-  const points2 = getPositions2().map((point) => new LatLng(point.latitude, point.longitude))
+  //const startPosition2 = new LatLng(-15.82449, -47.92756)
+  //const endPosition2 = new LatLng(-15.8276, -47.92621)
+  //const points2 = getPositions2().map((point) => new LatLng(point.latitude, point.longitude))
 
-  addRoute(map.value, startPosition2, endPosition2, points2)
+  //addRoute(map.value, startPosition2, endPosition2, points2)
 
+  //map.value.marker(startPosition1).addTo(map.value)
   /*
-  const car = L.marker(startPosition).addTo(map.value)
 
   window.Echo.channel('rides').listen(
     'PositionUpdated',
@@ -47,8 +49,8 @@ onMounted(() => {
 })
 
 function addRoute(map: Map, startPosition: LatLng, endPosition: LatLng, points: LatLng[]) {
-  setPosition(map, startPosition)
-  setPosition(map, endPosition)
+  setPosition(map, points[0])
+  setPosition(map, points[points.length - 1])
   setDirection(map, points)
 }
 
@@ -67,11 +69,61 @@ function setDirection(map: Map, directions: LatLng[]) {
     weight: 5,
     opacity: 0.9,
     smoothFactor: 1,
+    className: 'animate-pulse',
   })
   trace.addTo(map)
 
   const bounds = new LatLngBounds(directions)
   map.fitBounds(bounds)
+}
+
+//rodoviaria -> centro
+function getPositions4() {
+  const pos = [
+    [-56.073746, -15.614348],
+    [-56.073705, -15.614301],
+    [-56.071595, -15.615868],
+    [-56.071296, -15.615934],
+    [-56.070805, -15.615545],
+    [-56.070035, -15.616195],
+    [-56.070468, -15.61666],
+    [-56.072697, -15.614697],
+    [-56.08835, -15.601359],
+    [-56.089115, -15.59933],
+    [-56.089911, -15.597453],
+    [-56.090717, -15.596126],
+    [-56.092203, -15.595418],
+    [-56.092791, -15.59551],
+    [-56.093312, -15.595396],
+    [-56.095311, -15.594241],
+    [-56.09633, -15.595705],
+    [-56.095621, -15.596533],
+    [-56.095937, -15.596888],
+  ]
+  return pos.map((p) => ({ longitude: p[0], latitude: p[1] }))
+}
+
+// centro para shopping
+function getPositions3() {
+  const pos = [
+    [-56.095937, -15.596888],
+    [-56.09627, -15.59728],
+    [-56.097639, -15.596066],
+    [-56.094339, -15.591445],
+    [-56.092414, -15.59304],
+    [-56.091393, -15.59214],
+    [-56.089919, -15.591647],
+    [-56.088884, -15.590789],
+    [-56.084765, -15.589284],
+    [-56.083665, -15.588647],
+    [-56.077098, -15.581778],
+    [-56.076704, -15.580832],
+    [-56.076354, -15.579036],
+    [-56.073736, -15.575879],
+    [-56.073521, -15.576152],
+  ]
+
+  return pos.map((p) => ({ longitude: p[0], latitude: p[1] }))
 }
 
 function getPositions() {

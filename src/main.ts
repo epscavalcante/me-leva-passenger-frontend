@@ -5,11 +5,13 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './config/router'
-import FetchHttpAdapter from './clients/http/FetchHttpClient'
+import FetchHttpAdapter from './config/clients/http/FetchHttpClient'
 import Config from './config/app'
 import { RideHttpGateway } from './gateways/RideGateway'
-import Echo from './plugins/Echo'
-import { rideGatewayInjectionKey } from './config/app/injectionKeys'
+import Echo from './config/plugins/Echo'
+import { accountGatewayInjectionKey, rideGatewayInjectionKey } from './config/app/injectionKeys'
+import BaseInput from './components/BaseInput.vue'
+import { AccountHttpGateway } from './gateways/AccountGateway'
 
 const app = createApp(App)
 
@@ -29,5 +31,10 @@ const fetchHttpAdapter = new FetchHttpAdapter(Config.apiUrl)
 
 const rideGateway = new RideHttpGateway(fetchHttpAdapter)
 app.provide(rideGatewayInjectionKey, rideGateway)
+
+const accountGateway = new AccountHttpGateway(fetchHttpAdapter)
+app.provide(accountGatewayInjectionKey, accountGateway)
+
+app.component('BaseInput', BaseInput)
 
 app.mount('#app')

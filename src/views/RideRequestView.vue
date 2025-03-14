@@ -10,70 +10,42 @@ import {
   DialogRoot,
 } from 'radix-vue'
 import Utils from '@/utils'
-import type RideGateway from '@/gateways/RideGateway'
 import { useRouter } from 'vue-router'
 import BaseInput from '@/components/BaseInput.vue'
+import { rideGatewayInjectionKey } from '@/config/app/injectionKeys'
 
 const router = useRouter()
-let rideGateway: RideGateway
+const rideGateway = inject(rideGatewayInjectionKey)!
 
 const formInput = ref({
-  fromLatitude: -15.82449,
-  fromLongitude: -47.92756,
-  toLatitude: -15.8276,
-  toLongitude: -47.92621,
-})
-
-onBeforeMount(async () => {
-  rideGateway = inject('RideGateway') as RideGateway
+  fromLatitude: -15.597,
+  fromLongitude: -56.0958,
+  toLatitude: -15.57627,
+  toLongitude: -56.07371,
 })
 
 const isRideSimulationDialogOpened = ref(false)
 const isRideSimulationLoading = ref(true)
 
 const directions = computed(() => {
-  return [
-    { latitude: -15.82449, longitude: -47.92756 },
-    { latitude: -15.82404, longitude: -47.9269 },
-    { latitude: -15.82397, longitude: -47.9268 },
-    { latitude: -15.82386, longitude: -47.92661 },
-    { latitude: -15.82418, longitude: -47.92636 },
-    { latitude: -15.8243, longitude: -47.92627 },
-    { latitude: -15.82436, longitude: -47.92623 },
-    { latitude: -15.82441, longitude: -47.92619 },
-    { latitude: -15.82452, longitude: -47.92611 },
-    { latitude: -15.82465, longitude: -47.92601 },
-    { latitude: -15.82478, longitude: -47.9259 },
-    { latitude: -15.825, longitude: -47.9257 },
-    { latitude: -15.82501, longitude: -47.92573 },
-    { latitude: -15.82527, longitude: -47.92552 },
-    { latitude: -15.82537, longitude: -47.92546 },
-    { latitude: -15.82546, longitude: -47.92538 },
-    { latitude: -15.82554, longitude: -47.92532 },
-    { latitude: -15.82568, longitude: -47.92522 },
-    { latitude: -15.8257, longitude: -47.9252 },
-    { latitude: -15.82588, longitude: -47.92501 },
-    { latitude: -15.82601, longitude: -47.9252 },
-    { latitude: -15.82636, longitude: -47.92569 },
-    { latitude: -15.82648, longitude: -47.92584 },
-    { latitude: -15.82651, longitude: -47.92589 },
-    { latitude: -15.82656, longitude: -47.92596 },
-    { latitude: -15.8267, longitude: -47.92615 },
-    { latitude: -15.82733, longitude: -47.92706 },
-    { latitude: -15.82759, longitude: -47.9274 },
-    { latitude: -15.82807, longitude: -47.92805 },
-    { latitude: -15.82836, longitude: -47.92845 },
-    { latitude: -15.82843, longitude: -47.92839 },
-    { latitude: -15.82851, longitude: -47.92833 },
-    { latitude: -15.82825, longitude: -47.92797 },
-    { latitude: -15.82796, longitude: -47.92759 },
-    { latitude: -15.82773, longitude: -47.92727 },
-    { latitude: -15.82795, longitude: -47.92712 },
-    { latitude: -15.82804, longitude: -47.92703 },
-    { latitude: -15.82814, longitude: -47.92695 },
-    { latitude: -15.82812, longitude: -47.92692 },
-    { latitude: -15.8276, longitude: -47.92621 },
+  const pos = [
+    [-56.095937, -15.596888],
+    [-56.09627, -15.59728],
+    [-56.097639, -15.596066],
+    [-56.094339, -15.591445],
+    [-56.092414, -15.59304],
+    [-56.091393, -15.59214],
+    [-56.089919, -15.591647],
+    [-56.088884, -15.590789],
+    [-56.084765, -15.589284],
+    [-56.083665, -15.588647],
+    [-56.077098, -15.581778],
+    [-56.076704, -15.580832],
+    [-56.076354, -15.579036],
+    [-56.073736, -15.575879],
+    [-56.073521, -15.576152],
   ]
+  return pos.map((p) => ({ latitude: p[1], longitude: p[0] }))
 })
 
 async function openRideSimulation() {
@@ -89,11 +61,8 @@ function cancelSimulation() {
 
 async function requestRide() {
   const requestRideResponse = await rideGateway.requestRide({
-    passengerId: '6f9c9375-5671-3bbe-a412-dfae3a423061',
     ...formInput.value,
   })
-
-  console.log({ requestRideResponse })
 
   await router.push({
     name: 'rides.detail',
@@ -184,8 +153,8 @@ async function requestRide() {
           ></div>
           <TheMapping
             v-else
-            :current-position="{ latitude: -15.82449, longitude: -47.92756 }"
-            :end-position="{ latitude: -15.8276, longitude: -47.92621 }"
+            :current-position="{ latitude: -15.596888, longitude: -56.095937 }"
+            :end-position="{ latitude: -15.576152, longitude: -56.073521 }"
             :routing="directions"
             class="h-full"
           />

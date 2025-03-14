@@ -1,4 +1,5 @@
-import type HttpClient from '@/clients/http/HttpClient'
+import type HttpClient from '@/config/clients/http/HttpClient'
+import { authStore } from '@/config/stores/authStore'
 
 export default interface RideGateway {
   requestRide(body: RequestRideInput): Promise<RequestRideOutput>
@@ -8,22 +9,36 @@ export default interface RideGateway {
 }
 
 export class RideHttpGateway implements RideGateway {
-  constructor(private readonly httpClient: HttpClient) {}
+  private _authStore: any
+
+  constructor(private readonly httpClient: HttpClient) {
+    this._authStore = authStore()
+  }
 
   async getRideDetail(rideId: string): Promise<GetRideDetailOutput> {
     const response = await this.httpClient.getJson<GetRideDetailResponse>(`/api/rides/${rideId}`)
-    return response
+    return {
+      ...response,
+      fromLatitude: Number(response.fromLatitude),
+      fromLongitude: Number(response.fromLongitude),
+      toLatitude: Number(response.toLatitude),
+      toLongitude: Number(response.toLongitude),
+    }
   }
 
   async requestRide(body: RequestRideInput): Promise<RequestRideOutput> {
     const response = await this.httpClient.postJson<RequestRideApiInput, RequestRideApiOutput>(
       '/api/rides',
       {
-        passenger_id: body.passengerId,
         from_latitude: body.fromLatitude,
         from_longitude: body.fromLongitude,
         to_latitude: body.toLatitude,
         to_longitude: body.toLongitude,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this._authStore.getToken as string}`,
+        },
       },
     )
 
@@ -65,7 +80,6 @@ export class RideHttpGateway implements RideGateway {
 }
 
 export type RequestRideApiInput = {
-  passenger_id: string
   from_latitude: number
   from_longitude: number
   to_latitude: number
@@ -73,7 +87,6 @@ export type RequestRideApiInput = {
 }
 
 export type RequestRideInput = {
-  passengerId: string
   fromLatitude: number
   fromLongitude: number
   toLatitude: number
@@ -168,10 +181,10 @@ export type GetRidesResponse = {
 
 export type GetRideDetailOutput = {
   rideId: string
-  fromLatitude: string
-  fromLongitude: string
-  toLatitude: string
-  toLongitude: string
+  fromLatitude: number
+  fromLongitude: number
+  toLatitude: number
+  toLongitude: number
   driverId: string
   driverName: string
   passengerId: string
