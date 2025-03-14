@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { inject, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import type { GetRideDetailResponse } from '@/gateways/RideGateway'
+import type { GetRideDetailOutput } from '@/gateways/RideGateway'
 import TheMapping from '@/components/TheMapping.vue'
 import { toast } from 'vue-sonner'
 import { echoInjectionKey, rideGatewayInjectionKey } from '@/config/app/injectionKeys'
 const route = useRoute()
 const isLoading = ref(true)
-const rideDetail = ref<GetRideDetailResponse | null>(null)
+const rideDetail = ref<GetRideDetailOutput | null>(null)
 const rideGateway = inject(rideGatewayInjectionKey)
 const echo = inject(echoInjectionKey)
 
@@ -65,8 +65,14 @@ function setupRideEventsForRideId(rideId: string) {
       ></div>
       <TheMapping
         v-else
-        :current-position="{ latitude: -15.82449, longitude: -47.92756 }"
-        :end-position="{ latitude: -15.8276, longitude: -47.92621 }"
+        :current-position="{
+          latitude: rideDetail!.fromLatitude,
+          longitude: rideDetail!.fromLongitude,
+        }"
+        :end-position="{
+          latitude: rideDetail!.toLatitude,
+          longitude: rideDetail!.toLongitude,
+        }"
         class="h-full"
         :routing="
           rideDetail?.positions.map((item) => ({
