@@ -21,8 +21,8 @@ onMounted(() => {
   const points1 = getPositions4().map((point) => new LatLng(point.latitude, point.longitude))
   const points2 = getPositions3().map((point) => new LatLng(point.latitude, point.longitude))
 
-  addRoute(map.value, startPosition1, endPosition1, points1)
-  addRoute(map.value, startPosition1, endPosition1, points2)
+  addRoute(map.value, startPosition1, endPosition1, points1, 'red')
+  addRoute(map.value, startPosition1, endPosition1, points2, 'green')
 
   //const startPosition2 = new LatLng(-15.82449, -47.92756)
   //const endPosition2 = new LatLng(-15.8276, -47.92621)
@@ -48,10 +48,16 @@ onMounted(() => {
   map.value = map.value
 })
 
-function addRoute(map: Map, startPosition: LatLng, endPosition: LatLng, points: LatLng[]) {
+function addRoute(
+  map: Map,
+  startPosition: LatLng,
+  endPosition: LatLng,
+  points: LatLng[],
+  color?: string,
+) {
   setPosition(map, points[0])
   setPosition(map, points[points.length - 1])
-  setDirection(map, points)
+  setDirection(map, points, color)
 }
 
 function setPosition(map: Map, position: LatLng) {
@@ -61,11 +67,11 @@ function setPosition(map: Map, position: LatLng) {
   map.setView(position, 14, { animate: true })
 }
 
-function setDirection(map: Map, directions: LatLng[]) {
+function setDirection(map: Map, directions: LatLng[], color?: string) {
   const colors = ['black', 'red', 'blue', 'green']
 
   const trace = new Polyline(directions, {
-    color: colors[Math.floor(Math.random() * colors.length)],
+    color: color || colors[Math.floor(Math.random() * colors.length)],
     weight: 5,
     opacity: 0.9,
     smoothFactor: 1,

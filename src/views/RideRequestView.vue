@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeMount, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import TheMapping from '@/components/TheMapping.vue'
 import {
   DialogContent,
@@ -18,10 +18,10 @@ const router = useRouter()
 const rideGateway = inject(rideGatewayInjectionKey)!
 
 const formInput = ref({
-  fromLatitude: -15.597,
-  fromLongitude: -56.0958,
-  toLatitude: -15.57627,
-  toLongitude: -56.07371,
+  fromLatitude: -15.596888,
+  fromLongitude: -56.095937,
+  toLatitude: -15.576152,
+  toLongitude: -56.073521,
 })
 
 const isRideSimulationDialogOpened = ref(false)
