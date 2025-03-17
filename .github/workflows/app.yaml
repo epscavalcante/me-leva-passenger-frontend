@@ -23,12 +23,14 @@ concurrency:
 env:
   VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
   VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+  VITE_WEBSOCKET_ADAPTER: ${{ vars.VITE_WEBSOCKET_ADAPTER }}
+  VITE_WEBSOCKET_APP_KEY: ${{ vars.VITE_WEBSOCKET_APP_KEY }}
+  VITE_WEBSOCKET_CLUSTER: ${{ vars.VITE_WEBSOCKET_CLUSTER }}
+  VITE_WEBSOCKET_FORCE_TLS: ${{ vars.VITE_WEBSOCKET_FORCE_TLS }}
   VITE_WEBSOCKET_HOST: ${{ vars.VITE_WEBSOCKET_HOST }}
   VITE_WEBSOCKET_PORT: ${{ vars.VITE_WEBSOCKET_PORT }}
-  VITE_WEBSOCKET_APP_KEY: ${{ vars.VITE_WEBSOCKET_APP_KEY }}
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
@@ -51,7 +53,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload dist folder
           path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
