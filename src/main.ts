@@ -19,9 +19,9 @@ app.use(createPinia())
 app.use(router)
 
 app.use(Echo, {
-  key: 'my-app-key',
-  wsHost: 'localhost',
-  wsPort: 9000,
+  key: import.meta.env.VITE_WEBSOCKET_APP_KEY,
+  wsHost: import.meta.env.VITE_WEBSOCKET_HOST,
+  wsPort: import.meta.env.VITE_WEBSOCKET_PORT,
   wssPort: 443,
   forceTLS: false,
   enabledTransports: ['ws', 'wss'],
