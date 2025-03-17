@@ -4,12 +4,12 @@ import { RouterLink, useRoute } from 'vue-router'
 import type { GetRideDetailOutput } from '@/gateways/RideGateway'
 import TheMapping from '@/components/TheMapping.vue'
 import { toast } from 'vue-sonner'
-import { echoInjectionKey, rideGatewayInjectionKey } from '@/config/app/injectionKeys'
+import { rideGatewayInjectionKey, realtimeInjectionKey } from '@/config/app/injectionKeys'
 const route = useRoute()
 const isLoading = ref(true)
 const rideDetail = ref<GetRideDetailOutput | null>(null)
 const rideGateway = inject(rideGatewayInjectionKey)
-const echo = inject(echoInjectionKey)
+const realtime = inject(realtimeInjectionKey)
 
 onMounted(async () => {
   const rideId = route.params.rideId as string
@@ -25,7 +25,7 @@ async function getRideDetail(rideId: string) {
 }
 
 function setupRideEventsForRideId(rideId: string) {
-  echo!
+  realtime!
     .channel(`rides.${rideId}`)
     .listen('.RIDE.ACCEPTED', function () {
       toast('Ride accepted')
