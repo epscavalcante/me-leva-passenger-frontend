@@ -16,7 +16,10 @@ export class RideHttpGateway implements RideGateway {
   }
 
   async getRideDetail(rideId: string): Promise<GetRideDetailOutput> {
-    const response = await this.httpClient.getJson<GetRideDetailResponse>(`/api/rides/${rideId}`)
+    const response = await this.httpClient.getJson<GetRideDetailResponse>(
+      `/api/rides/${rideId}`,
+      this.getHeaders(),
+    )
     return {
       ...response,
       fromLatitude: Number(response.fromLatitude),
@@ -35,11 +38,7 @@ export class RideHttpGateway implements RideGateway {
         to_latitude: body.toLatitude,
         to_longitude: body.toLongitude,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${this._authStore.getToken as string}`,
-        },
-      },
+      this.getHeaders(),
     )
 
     return {
@@ -55,6 +54,7 @@ export class RideHttpGateway implements RideGateway {
         sort_by: 'created_at',
         sort_dir: 'DESC',
       },
+      ...this.getHeaders(),
     })
 
     // onde faço a conversão para camelCase
@@ -71,10 +71,19 @@ export class RideHttpGateway implements RideGateway {
         sort_by: params?.sortBy,
         sort_dir: params?.sortDir,
       },
+      ...this.getHeaders(),
     })
     return {
       total: response.total,
       items: response.items,
+    }
+  }
+
+  private getHeaders() {
+    return {
+      headers: {
+        Authorization: `Bearer ${this._authStore.getToken as string}`,
+      },
     }
   }
 }
